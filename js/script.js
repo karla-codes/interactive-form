@@ -6,6 +6,7 @@ const jobRoleSelect = document.querySelector('#title');
 const colorSelect = document.querySelector('#color');
 const designSelect = document.querySelector('#design');
 const activityFieldset = document.querySelector('#activities');
+const activities = activityFieldset.querySelectorAll('input');
 const totalActivityCost = document.querySelector('#activities-cost');
 const paymentMethodSelect = document.querySelector('#payment');
 const paymentOptions = paymentMethodSelect.querySelectorAll('option');
@@ -73,6 +74,16 @@ function updateActivitiesTotal(activity, cost) {
   totalActivityCost.textContent = `Total: $${totalCost}`;
 }
 
+// add '.focus' className to activities on focus event
+function addFocus(activity) {
+  activity.classList.add('focus');
+}
+
+// remove '.focus' className to activities on blur event
+function removeFocus(activity) {
+  activity.classList.remove('focus');
+}
+
 // default payment option === credit card
 creditCardOption.setAttribute('selected', true);
 
@@ -81,7 +92,6 @@ paypalInfo.hidden = true;
 bitcoinInfo.hidden = true;
 
 // when a payment method is selected, show selected payment info and hide the rest
-
 function updatePaymentMethod() {
   for (let i = 0; i < paymentOptions.length; i++) {
     const paymentOption = paymentOptions[i];
@@ -112,61 +122,114 @@ function updatePaymentMethod() {
 //  -zip code must contain 5 digits
 //  -CVV must contain 3 digits
 
+// adds visual elements to invalid entries
+function notValid(el) {
+  const hint = el.lastElementChild;
+  el.classList.add('not-valid');
+  el.classList.remove('valid');
+  hint.style.display = 'unset';
+}
+
+// removes invalid visual elements
+function valid(el) {
+  const hint = el.lastElementChild;
+  el.classList.add('valid');
+  el.classList.remove('not-valid');
+  hint.style.display = 'none';
+}
+
 // validates name field
 const validateName = () => {
+  const nameLabel = nameInput.parentElement;
+  // const hint = nameLabel.lastElementChild;
   const nameRegex = /^.+$/;
   if (nameRegex.test(nameInput.value)) {
+    valid(nameLabel);
     return true;
   } else {
+    notValid(nameLabel);
     return false;
   }
 };
 
 // validates email field
 const validateEmail = () => {
+  const emailLabel = emailInput.parentElement;
   const emailRegex = /^.+@.+\.com$/;
   if (emailRegex.test(emailInput.value)) {
+    valid(emailLabel);
     return true;
   } else {
+    notValid(emailLabel);
     return false;
   }
 };
 
 // validates activities
 const validateActivities = () => {
-  const activities = activityFieldset.querySelectorAll('input');
+  const checked = [];
+  const unchecked = [];
   for (let i = 0; i < activities.length; i++) {
     if (activities[i].checked) {
-      return true;
+      checked.push(activities[i]);
     } else {
-      return false;
+      unchecked.push(activities[i]);
     }
+  }
+
+  if (checked.length > 0) {
+    valid(activityFieldset);
+    return true;
+  } else {
+    notValid(activityFieldset);
+    return false;
   }
 };
 
 // validates credit card IF selected
 const validateCreditCard = () => {
   const creditCardOption = paymentOptions[1].selected;
-  const ccNumber = Number(document.querySelector('#cc-num').value);
-  const zipCode = Number(document.querySelector('#zip').value);
-  const cvv = Number(document.querySelector('#cvv').value);
+  const ccNumber = document.querySelector('#cc-num');
+  const zipCode = document.querySelector('#zip');
+  const cvv = document.querySelector('#cvv');
+  const ccLabel = ccNumber.parentElement;
+  const zipCodeLabel = zipCode.parentElement;
+  const cvvLabel = cvv.parentElement;
+  const validItems = [];
 
   if (creditCardOption) {
     const ccNumberRegex = /\b\d{13,16}\b/;
     const zipCodeRegex = /^\d{5}$/;
     const cvvRegex = /^\d{3}$/;
 
-    if (
-      ccNumberRegex.test(ccNumber) &&
-      zipCodeRegex.test(zipCode) &&
-      cvvRegex.test(cvv)
-    ) {
-      return true;
+    if (ccNumberRegex.test(Number(ccNumber.value))) {
+      valid(ccLabel);
+      validItems.push(ccNumber.value);
     } else {
-      console.log(typeof ccNumber, typeof zipCode, typeof cvv);
+      notValid(ccLabel);
+      return false;
+    }
+
+    if (zipCodeRegex.test(Number(zipCode.value))) {
+      valid(zipCodeLabel);
+      validItems.push(zipCode.value);
+    } else {
+      notValid(zipCodeLabel);
+      return false;
+    }
+
+    if (cvvRegex.test(Number(cvv.value))) {
+      valid(cvvLabel);
+      validItems.push(cvv.value);
+    } else {
+      notValid(cvvLabel);
       return false;
     }
   } else {
+    return true;
+  }
+
+  if (validItems.length === 3) {
     return true;
   }
 };
@@ -186,6 +249,17 @@ activityFieldset.addEventListener('change', e => {
   const activity = e.target;
   const activityCost = Number(activity.getAttribute('data-cost'));
   updateActivitiesTotal(activity, activityCost);
+});
+
+activities.forEach(activity => {
+  const activityLabel = activity.parentElement;
+
+  activity.addEventListener('focus', e => {
+    addFocus(activityLabel);
+  });
+  activity.addEventListener('blur', e => {
+    removeFocus(activityLabel);
+  });
 });
 
 paymentMethodSelect.addEventListener('change', updatePaymentMethod);
