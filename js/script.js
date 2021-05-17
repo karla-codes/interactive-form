@@ -5,6 +5,13 @@ const colorSelect = document.querySelector('#color');
 const designSelect = document.querySelector('#design');
 const activityFieldset = document.querySelector('#activities');
 const totalActivityCost = document.querySelector('#activities-cost');
+const paymentMethodSelect = document.querySelector('#payment');
+const creditCardOption = document.querySelector(
+  '#payment [value="credit-card"]'
+);
+const creditCardInfo = document.querySelector('#credit-card');
+const paypalInfo = document.querySelector('#paypal');
+const bitcoinInfo = document.querySelector('#bitcoin');
 let totalCost = 0;
 
 // add default focus state
@@ -63,6 +70,37 @@ function updateActivitiesTotal(activity, cost) {
   totalActivityCost.textContent = `Total: $${totalCost}`;
 }
 
+// default payment option === credit card
+creditCardOption.setAttribute('selected', true);
+
+// hide all payment option info except credit card
+paypalInfo.hidden = true;
+bitcoinInfo.hidden = true;
+
+// when a payment method is selected, show selected payment info and hide the rest
+function updatePaymentMethod() {
+  const paymentOptions = paymentMethodSelect.querySelectorAll('option');
+
+  for (let i = 0; i < paymentOptions.length; i++) {
+    const paymentOption = paymentOptions[i];
+    if (paymentOption.selected) {
+      if (paymentOption.value === creditCardInfo.id) {
+        creditCardInfo.hidden = false;
+        paypalInfo.hidden = true;
+        bitcoinInfo.hidden = true;
+      } else if (paymentOption.value === paypalInfo.id) {
+        paypalInfo.hidden = false;
+        bitcoinInfo.hidden = true;
+        creditCardInfo.hidden = true;
+      } else {
+        bitcoinInfo.hidden = false;
+        paypalInfo.hidden = true;
+        creditCardInfo.hidden = true;
+      }
+    }
+  }
+}
+
 // event listeners
 jobRoleSelect.addEventListener('change', e => {
   const selectedOption = e.target.selectedOptions[0].value;
@@ -79,3 +117,5 @@ activityFieldset.addEventListener('change', e => {
   const activityCost = Number(activity.getAttribute('data-cost'));
   updateActivitiesTotal(activity, activityCost);
 });
+
+paymentMethodSelect.addEventListener('change', updatePaymentMethod);
