@@ -3,6 +3,9 @@ const otherJobInput = document.querySelector('#other-job-role');
 const jobRoleSelect = document.querySelector('#title');
 const colorSelect = document.querySelector('#color');
 const designSelect = document.querySelector('#design');
+const activityFieldset = document.querySelector('#activities');
+const totalActivityCost = document.querySelector('#activities-cost');
+let totalCost = 0;
 
 // add default focus state
 nameInput.focus();
@@ -25,6 +28,7 @@ colorSelect.setAttribute('disabled', true);
 // when 'design' select element detects 'change':
 // 1. enable 'color' select element
 // 2. display color selections based on 'design' selection
+// takes the 'option' parameter
 function displayColorOptions(option) {
   const jsPunsColors = document.querySelectorAll('[data-theme="js puns"]');
   const heartJSColors = document.querySelectorAll('[data-theme="heart js"]');
@@ -47,6 +51,19 @@ function displayColorOptions(option) {
   }
 }
 
+// when an activity is selected (check mark), cost is added to totalActivityCost
+// when an activity is unselected, cost is subtracted from totalActivityCost
+function updateActivitiesTotal(activity, cost) {
+  if (activity.checked) {
+    totalCost += cost;
+  } else {
+    totalCost -= cost;
+  }
+
+  totalActivityCost.textContent = `Total: $${totalCost}`;
+}
+
+// event listeners
 jobRoleSelect.addEventListener('change', e => {
   const selectedOption = e.target.selectedOptions[0].value;
   displayTextField(selectedOption);
@@ -55,4 +72,10 @@ jobRoleSelect.addEventListener('change', e => {
 designSelect.addEventListener('change', e => {
   const selectedOption = e.target.selectedOptions[0].value;
   displayColorOptions(selectedOption);
+});
+
+activityFieldset.addEventListener('change', e => {
+  const activity = e.target;
+  const activityCost = Number(activity.getAttribute('data-cost'));
+  updateActivitiesTotal(activity, activityCost);
 });
