@@ -37,7 +37,6 @@ colorSelect.setAttribute('disabled', true);
 
 // default payment option === credit card
 creditCardOption.setAttribute('selected', true);
-
 // hide all payment option info except credit card
 paypalInfo.hidden = true;
 bitcoinInfo.hidden = true;
@@ -83,6 +82,40 @@ function displayColorOptions(option) {
       color.removeAttribute('hidden');
     });
   }
+}
+
+//
+/**
+ * checks time of activity selected and disables/enables other activities with the same start time
+ *
+ * @param {element} selectedActivity - input element checked/unchecked
+ */
+function checkActivityTime(selectedActivity) {
+  const selectedActivityData =
+    selectedActivity.getAttribute('data-day-and-time');
+  const selectedActivityLabel = selectedActivity.parentElement;
+
+  activities.forEach(activity => {
+    const activityData = activity.getAttribute('data-day-and-time');
+    const activityLabel = activity.parentElement;
+    if (selectedActivity.checked) {
+      if (activityData) {
+        if (activityData === selectedActivityData) {
+          activity.disabled = true;
+          selectedActivity.disabled = false;
+          activityLabel.classList.add('disabled');
+          selectedActivityLabel.classList.remove('disabled');
+        }
+      }
+    } else {
+      if (activityData) {
+        if (activityData === selectedActivityData) {
+          activity.disabled = false;
+          activityLabel.classList.remove('disabled');
+        }
+      }
+    }
+  });
 }
 
 /**
@@ -307,6 +340,7 @@ activityFieldset.addEventListener('change', e => {
   const activity = e.target;
   const activityCost = Number(activity.getAttribute('data-cost'));
   updateActivitiesTotal(activity, activityCost);
+  checkActivityTime(activity);
 });
 
 activities.forEach(activity => {
