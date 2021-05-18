@@ -24,7 +24,6 @@ const cvv = document.querySelector('#cvv');
 const ccLabel = ccNumber.parentElement;
 const zipCodeLabel = zipCode.parentElement;
 const cvvLabel = cvv.parentElement;
-const validatedInputs = [nameInput, emailInput, ccNumber, zipCode, cvv];
 let totalCost = 0;
 
 // add default focus state
@@ -232,11 +231,18 @@ const validateName = () => {
  */
 const validateEmail = () => {
   const emailRegex = /^.+@.+\.com$/;
+  const hint = emailLabel.lastElementChild;
   if (emailRegex.test(emailInput.value)) {
     valid(emailLabel);
     return true;
+  } else if (emailInput.value === '') {
+    emailLabel.classList.add('not-valid');
+    hint.textContent = 'An email must be provided';
+    hint.style.display = 'unset';
+    return false;
   } else {
     notValid(emailLabel);
+    hint.textContent = 'Email address must be formatted correctly';
     return false;
   }
 };
