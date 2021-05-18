@@ -32,7 +32,21 @@ nameInput.focus();
 // hide job text input on page load
 otherJobInput.style.display = 'none';
 
-// when select element detects 'change', update job text input to display/hide based on selection
+// disable color select element
+colorSelect.setAttribute('disabled', true);
+
+// default payment option === credit card
+creditCardOption.setAttribute('selected', true);
+
+// hide all payment option info except credit card
+paypalInfo.hidden = true;
+bitcoinInfo.hidden = true;
+
+/**
+ * when 'select' element detects 'change', update job text input to display/hide based on selection
+ *
+ * @param {string} option -'Other' option for job selection
+ */
 function displayTextField(option) {
   if (option === 'other') {
     otherJobInput.style.display = '';
@@ -41,13 +55,14 @@ function displayTextField(option) {
   }
 }
 
-// disable color select element
-colorSelect.setAttribute('disabled', true);
-
-// when 'design' select element detects 'change':
-// 1. enable 'color' select element
-// 2. display color selections based on 'design' selection
-// takes the 'option' parameter
+/**
+ * when 'design' select element detects 'change':
+ * 1. enable 'color' select element
+ * 2. display color selections based on 'design' selection
+ * takes the 'option' parameter
+ *
+ * @param {string} option - tshirt design option
+ */
 function displayColorOptions(option) {
   const jsPunsColors = document.querySelectorAll('[data-theme="js puns"]');
   const heartJSColors = document.querySelectorAll('[data-theme="heart js"]');
@@ -70,8 +85,13 @@ function displayColorOptions(option) {
   }
 }
 
-// when an activity is selected (check mark), cost is added to totalActivityCost
-// when an activity is unselected, cost is subtracted from totalActivityCost
+/**
+ * when an activity is selected (check mark), cost is added to totalActivityCost
+ * when an activity is unselected, cost is subtracted from totalActivityCost
+ *
+ * @param {element} activity - input element for activity
+ * @param {number} cost - cost of activity
+ */
 function updateActivitiesTotal(activity, cost) {
   if (activity.checked) {
     totalCost += cost;
@@ -82,22 +102,23 @@ function updateActivitiesTotal(activity, cost) {
   totalActivityCost.textContent = `Total: $${totalCost}`;
 }
 
-// add '.focus' className to activities on focus event
+/**
+ * add '.focus' className to activities on focus event
+ *
+ * @param {element} activity - focused activity element
+ */
 function addFocus(activity) {
   activity.classList.add('focus');
 }
 
-// remove '.focus' className to activities on blur event
+/**
+ * remove '.focus' className to activities on blur event
+ *
+ * @param {element} activity - activity element with no focus
+ */
 function removeFocus(activity) {
   activity.classList.remove('focus');
 }
-
-// default payment option === credit card
-creditCardOption.setAttribute('selected', true);
-
-// hide all payment option info except credit card
-paypalInfo.hidden = true;
-bitcoinInfo.hidden = true;
 
 // when a payment method is selected, show selected payment info and hide the rest
 function updatePaymentMethod() {
@@ -130,7 +151,11 @@ function updatePaymentMethod() {
 //  -zip code must contain 5 digits
 //  -CVV must contain 3 digits
 
-// adds visual elements to invalid entries
+/**
+ * adds visual elements to invalid entries
+ *
+ * @param {element} el - invalid entry
+ */
 function notValid(el) {
   const hint = el.lastElementChild;
   el.classList.add('not-valid');
@@ -138,7 +163,11 @@ function notValid(el) {
   hint.style.display = 'unset';
 }
 
-// removes invalid visual elements
+/**
+ * removes invalid visual elements
+ *
+ * @param {element} el - valid entry
+ */
 function valid(el) {
   const hint = el.lastElementChild;
   el.classList.add('valid');
@@ -146,9 +175,12 @@ function valid(el) {
   hint.style.display = 'none';
 }
 
-// validates name field
+/**
+ * validates name field
+ *
+ * @returns {boolean} returns true if field is valid, false if NOT valid
+ */
 const validateName = () => {
-  // const hint = nameLabel.lastElementChild;
   const nameRegex = /^.+$/;
   if (nameRegex.test(nameInput.value)) {
     valid(nameLabel);
@@ -159,7 +191,11 @@ const validateName = () => {
   }
 };
 
-// validates email field
+/**
+ * validates email field
+ *
+ * @returns {boolean} returns true if field is valid, false if NOT valid
+ */
 const validateEmail = () => {
   const emailRegex = /^.+@.+\.com$/;
   if (emailRegex.test(emailInput.value)) {
@@ -171,15 +207,16 @@ const validateEmail = () => {
   }
 };
 
-// validates activities
+/**
+ * validates activities
+ *
+ * @returns {boolean} returns true if field is valid, false if NOT valid
+ */
 const validateActivities = () => {
   const checked = [];
-  const unchecked = [];
   for (let i = 0; i < activities.length; i++) {
     if (activities[i].checked) {
       checked.push(activities[i]);
-    } else {
-      unchecked.push(activities[i]);
     }
   }
 
@@ -192,8 +229,11 @@ const validateActivities = () => {
   }
 };
 
-// validates credit card IF selected
-
+/**
+ * validates credit card information IF credit card payment method is selected
+ *
+ * @returns {boolean} returns true if field is valid or other payment method is selected, false if NOT valid
+ */
 const validateCreditCard = () => {
   const creditCardOption = paymentOptions[1].selected;
   const validItems = [];
@@ -234,8 +274,8 @@ const validateCreditCard = () => {
   }
 };
 
-// if entire form is blank when submitted, show all error indications
-function blankForm() {
+// if entire form is blank when submitted, show all field error indications
+function checkBlankForm() {
   if (
     nameInput.value === '' &&
     emailInput.value === '' &&
@@ -250,11 +290,9 @@ function blankForm() {
     notValid(ccLabel);
     notValid(zipCodeLabel);
     notValid(cvvLabel);
-    return false;
   }
 }
 
-// event listeners
 jobRoleSelect.addEventListener('change', e => {
   const selectedOption = e.target.selectedOptions[0].value;
   displayTextField(selectedOption);
@@ -274,10 +312,10 @@ activityFieldset.addEventListener('change', e => {
 activities.forEach(activity => {
   const activityLabel = activity.parentElement;
 
-  activity.addEventListener('focus', e => {
+  activity.addEventListener('focus', () => {
     addFocus(activityLabel);
   });
-  activity.addEventListener('blur', e => {
+  activity.addEventListener('blur', () => {
     removeFocus(activityLabel);
   });
 });
@@ -294,7 +332,7 @@ form.addEventListener('submit', e => {
     return;
   } else {
     e.preventDefault();
-    blankForm();
+    checkBlankForm();
     validateName();
     validateEmail();
     validateActivities();
