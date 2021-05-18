@@ -16,5 +16,5 @@ Make the form more user-friendly by:
 Optional extra credit tasks that I've added to this project:
 
 - Prevent users from registering or conflicting activities
-- Add real-time error message to at least one required field
-- Add a conditional error message to at least one required field
+- Added real-time error message to all input fields
+- Added a conditional error message to email field when left blank
