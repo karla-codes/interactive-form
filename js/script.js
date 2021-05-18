@@ -1,6 +1,8 @@
 const form = document.querySelector('form');
 const nameInput = document.querySelector('#name');
+const nameLabel = nameInput.parentElement;
 const emailInput = document.querySelector('#email');
+const emailLabel = emailInput.parentElement;
 const otherJobInput = document.querySelector('#other-job-role');
 const jobRoleSelect = document.querySelector('#title');
 const colorSelect = document.querySelector('#color');
@@ -16,6 +18,12 @@ const creditCardOption = document.querySelector(
 const creditCardInfo = document.querySelector('#credit-card');
 const paypalInfo = document.querySelector('#paypal');
 const bitcoinInfo = document.querySelector('#bitcoin');
+const ccNumber = document.querySelector('#cc-num');
+const zipCode = document.querySelector('#zip');
+const cvv = document.querySelector('#cvv');
+const ccLabel = ccNumber.parentElement;
+const zipCodeLabel = zipCode.parentElement;
+const cvvLabel = cvv.parentElement;
 let totalCost = 0;
 
 // add default focus state
@@ -140,7 +148,6 @@ function valid(el) {
 
 // validates name field
 const validateName = () => {
-  const nameLabel = nameInput.parentElement;
   // const hint = nameLabel.lastElementChild;
   const nameRegex = /^.+$/;
   if (nameRegex.test(nameInput.value)) {
@@ -154,7 +161,6 @@ const validateName = () => {
 
 // validates email field
 const validateEmail = () => {
-  const emailLabel = emailInput.parentElement;
   const emailRegex = /^.+@.+\.com$/;
   if (emailRegex.test(emailInput.value)) {
     valid(emailLabel);
@@ -187,14 +193,9 @@ const validateActivities = () => {
 };
 
 // validates credit card IF selected
+
 const validateCreditCard = () => {
   const creditCardOption = paymentOptions[1].selected;
-  const ccNumber = document.querySelector('#cc-num');
-  const zipCode = document.querySelector('#zip');
-  const cvv = document.querySelector('#cvv');
-  const ccLabel = ccNumber.parentElement;
-  const zipCodeLabel = zipCode.parentElement;
-  const cvvLabel = cvv.parentElement;
   const validItems = [];
 
   if (creditCardOption) {
@@ -207,7 +208,6 @@ const validateCreditCard = () => {
       validItems.push(ccNumber.value);
     } else {
       notValid(ccLabel);
-      return false;
     }
 
     if (zipCodeRegex.test(Number(zipCode.value))) {
@@ -215,7 +215,6 @@ const validateCreditCard = () => {
       validItems.push(zipCode.value);
     } else {
       notValid(zipCodeLabel);
-      return false;
     }
 
     if (cvvRegex.test(Number(cvv.value))) {
@@ -223,7 +222,6 @@ const validateCreditCard = () => {
       validItems.push(cvv.value);
     } else {
       notValid(cvvLabel);
-      return false;
     }
   } else {
     return true;
@@ -231,8 +229,30 @@ const validateCreditCard = () => {
 
   if (validItems.length === 3) {
     return true;
+  } else {
+    return false;
   }
 };
+
+// if entire form is blank when submitted, show all error indications
+function blankForm() {
+  if (
+    nameInput.value === '' &&
+    emailInput.value === '' &&
+    !activities.checked &&
+    ccNumber.value === '' &&
+    zipCode.value === '' &&
+    cvv.value === ''
+  ) {
+    notValid(nameLabel);
+    notValid(emailLabel);
+    notValid(activityFieldset);
+    notValid(ccLabel);
+    notValid(zipCodeLabel);
+    notValid(cvvLabel);
+    return false;
+  }
+}
 
 // event listeners
 jobRoleSelect.addEventListener('change', e => {
@@ -274,5 +294,10 @@ form.addEventListener('submit', e => {
     return;
   } else {
     e.preventDefault();
+    blankForm();
+    validateName();
+    validateEmail();
+    validateActivities();
+    validateCreditCard();
   }
 });
