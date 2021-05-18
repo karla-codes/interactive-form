@@ -24,6 +24,7 @@ const cvv = document.querySelector('#cvv');
 const ccLabel = ccNumber.parentElement;
 const zipCodeLabel = zipCode.parentElement;
 const cvvLabel = cvv.parentElement;
+const validatedInputs = [nameInput, emailInput, ccNumber, zipCode, cvv];
 let totalCost = 0;
 
 // add default focus state
@@ -263,49 +264,69 @@ const validateActivities = () => {
 };
 
 /**
- * validates credit card information IF credit card payment method is selected
+ * validates cc # field
  *
- * @returns {boolean} returns true if field is valid or other payment method is selected, false if NOT valid
+ * @returns {boolean} returns true if field is valid, false if NOT valid
  */
-const validateCreditCard = () => {
-  const creditCardOption = paymentOptions[1].selected;
-  const validItems = [];
-
-  if (creditCardOption) {
-    const ccNumberRegex = /\b\d{13,16}\b/;
-    const zipCodeRegex = /^\d{5}$/;
-    const cvvRegex = /^\d{3}$/;
-
-    if (ccNumberRegex.test(Number(ccNumber.value))) {
-      valid(ccLabel);
-      validItems.push(ccNumber.value);
-    } else {
-      notValid(ccLabel);
-    }
-
-    if (zipCodeRegex.test(Number(zipCode.value))) {
-      valid(zipCodeLabel);
-      validItems.push(zipCode.value);
-    } else {
-      notValid(zipCodeLabel);
-    }
-
-    if (cvvRegex.test(Number(cvv.value))) {
-      valid(cvvLabel);
-      validItems.push(cvv.value);
-    } else {
-      notValid(cvvLabel);
-    }
-  } else {
-    return true;
-  }
-
-  if (validItems.length === 3) {
+const validateCCNumber = () => {
+  const ccNumberRegex = /\b\d{13,16}\b/;
+  if (ccNumberRegex.test(Number(ccNumber.value))) {
+    valid(ccLabel);
     return true;
   } else {
+    notValid(ccLabel);
     return false;
   }
 };
+
+/**
+ * validates zip code field
+ *
+ * @returns {boolean} returns true if field is valid, false if NOT valid
+ */
+const validateZipCode = () => {
+  const zipCodeRegex = /^\d{5}$/;
+  if (zipCodeRegex.test(Number(zipCode.value))) {
+    valid(zipCodeLabel);
+    return true;
+  } else {
+    notValid(zipCodeLabel);
+    return false;
+  }
+};
+
+/**
+ * validates cvv field
+ *
+ * @returns {boolean} returns true if field is valid, false if NOT valid
+ */
+const validateCVV = () => {
+  const cvvRegex = /^\d{3}$/;
+  if (cvvRegex.test(Number(cvv.value))) {
+    valid(cvvLabel);
+    return true;
+  } else {
+    notValid(cvvLabel);
+    return false;
+  }
+};
+
+/**
+ * validates credit card information IF credit card payment method is selected
+ *
+ * @returns {boolean} returns true if credit card is not selecting and runs validation on CC fields if CC is selected, returning true if they pass or false if they don't
+ */
+function ifCreditCardSelected() {
+  const creditCardOption = paymentOptions[1].selected;
+
+  if (creditCardOption) {
+    validateCCNumber();
+    validateZipCode();
+    validateCVV();
+  } else {
+    return true;
+  }
+}
 
 // if entire form is blank when submitted, show all field error indications
 function checkBlankForm() {
@@ -361,7 +382,9 @@ form.addEventListener('submit', e => {
     validateName() &&
     validateEmail() &&
     validateActivities() &&
-    validateCreditCard()
+    validateCCNumber() &&
+    validateZipCode() &&
+    validateCVV()
   ) {
     return;
   } else {
@@ -370,6 +393,21 @@ form.addEventListener('submit', e => {
     validateName();
     validateEmail();
     validateActivities();
-    validateCreditCard();
+    ifCreditCardSelected();
+  }
+});
+
+form.addEventListener('keyup', e => {
+  const input = e.target;
+  if (input === nameInput) {
+    validateName();
+  } else if (input === emailInput) {
+    validateEmail();
+  } else if (input === ccNumber) {
+    validateCCNumber();
+  } else if (input === zipCode) {
+    validateZipCode();
+  } else if (input === cvv) {
+    validateCVV();
   }
 });
