@@ -331,9 +331,11 @@ function ifCreditCardSelected() {
   const creditCardOption = paymentOptions[1].selected;
 
   if (creditCardOption) {
-    validateCCNumber();
-    validateZipCode();
-    validateCVV();
+    if (validateCCNumber() && validateZipCode() && validateCVV()) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
     return true;
   }
@@ -393,9 +395,7 @@ form.addEventListener('submit', e => {
     validateName() &&
     validateEmail() &&
     validateActivities() &&
-    validateCCNumber() &&
-    validateZipCode() &&
-    validateCVV()
+    ifCreditCardSelected()
   ) {
     return;
   } else {
