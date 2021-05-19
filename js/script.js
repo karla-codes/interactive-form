@@ -60,28 +60,33 @@ function displayTextField(option) {
  * 2. display color selections based on 'design' selection
  * takes the 'option' parameter
  *
- * @param {string} option - tshirt design option
+ * @param {string} designOption - tshirt design option
  */
-function displayColorOptions(option) {
-  const jsPunsColors = document.querySelectorAll('[data-theme="js puns"]');
-  const heartJSColors = document.querySelectorAll('[data-theme="heart js"]');
+function displayColorOptions(designOption) {
+  const colorOptions = colorSelect.querySelectorAll('option');
+  const selectDesignOption = colorOptions[0];
   colorSelect.removeAttribute('disabled');
+  selectDesignOption.setAttribute('selected', true);
 
-  if (option === 'js puns') {
-    heartJSColors.forEach(color => {
-      color.setAttribute('hidden', true);
-    });
-    jsPunsColors.forEach(color => {
-      color.removeAttribute('hidden');
-    });
-  } else if (option === 'heart js') {
-    jsPunsColors.forEach(color => {
-      color.setAttribute('hidden', true);
-    });
-    heartJSColors.forEach(color => {
-      color.removeAttribute('hidden');
-    });
-  }
+  colorOptions.forEach(option => {
+    const colorTheme = option.dataset.theme;
+
+    if (designOption === 'js puns') {
+      if (colorTheme && colorTheme === 'heart js') {
+        option.setAttribute('hidden', true);
+      } else {
+        option.removeAttribute('hidden');
+        option.removeAttribute('selected');
+      }
+    } else if (designOption === 'heart js') {
+      if (colorTheme && colorTheme === 'js puns') {
+        option.setAttribute('hidden', true);
+      } else {
+        option.removeAttribute('hidden');
+        option.removeAttribute('selected');
+      }
+    }
+  });
 }
 
 //
